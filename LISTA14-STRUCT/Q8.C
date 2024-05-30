@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <corecrt_search.h>
 
 #define MAX_CHARS 100
 #define NUM_PESSOAS 5
