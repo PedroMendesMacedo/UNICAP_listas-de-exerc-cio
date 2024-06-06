@@ -40,46 +40,46 @@ void adicionarProduto() {
     printf("Deseja adicionar o registro no início (I) ou no final (F) do arquivo? ");
     scanf(" %c", &escolha);
 
-    if (escolha == 'I' || escolha == 'i') {
-        file = fopen(FILE_NAME, "r+");
-        if (file == NULL) {
+    if (escolha == 'I' || escolha == 'i') {  // Se a escolha for "início"
+        file = fopen(FILE_NAME, "r+");  // Abre o arquivo para leitura e escrita, não cria um novo arquivo.
+        if (file == NULL) {             // Se o arquivo não existe, cria um novo.
             file = fopen(FILE_NAME, "w");
         }
-        fseek(file, 0, SEEK_END);
-        long tamanho = ftell(file);
-        char *buffer = (char*)malloc(tamanho);
-        rewind(file);
-        fread(buffer, 1, tamanho, file);
-        rewind(file);
-        fwrite(&produto, sizeof(struct Produto), 1, file);
-        fwrite(buffer, 1, tamanho, file);
-        free(buffer);
-    } else {
-        file = fopen(FILE_NAME, "a");
-        if (file == NULL) {
-            file = fopen(FILE_NAME, "w");
+fseek(file, 0, SEEK_END);       // Move o ponteiro do arquivo para o final.
+        long tamanho = ftell(file);     // Obtém o tamanho do arquivo.
+        char *buffer = (char*)malloc(tamanho);  // Aloca memória suficiente para armazenar o conteúdo do arquivo.
+        rewind(file);                   // Move o ponteiro do arquivo de volta para o início.
+        fread(buffer, 1, tamanho, file); // Lê o conteúdo do arquivo para o buffer.
+        rewind(file);                   // Move o ponteiro do arquivo de volta para o início novamente.
+        fwrite(&produto, sizeof(struct Produto), 1, file);  // Escreve o novo produto no início do arquivo.
+        fwrite(buffer, 1, tamanho, file);  // Escreve o conteúdo original do arquivo após o novo produto.
+        free(buffer);                      // Libera a memória alocada para o buffer.
+    } else {  // Se a escolha for "final"
+        file = fopen(FILE_NAME, "a");  // Abre o arquivo para escrita no final, cria um novo arquivo se não existir.
+        if (file == NULL) {            // Verifica se o arquivo foi aberto com sucesso.
+            file = fopen(FILE_NAME, "w");  // Se não, cria um novo arquivo.
         }
-        fwrite(&produto, sizeof(struct Produto), 1, file);
+        fwrite(&produto, sizeof(struct Produto), 1, file);  // Escreve o novo produto no final do arquivo.
     }
-    fclose(file);
+    fclose(file);  // Fecha o arquivo.
 
     printf("Produto adicionado com sucesso!\n");
 }
 
 void listarProdutos() {
-    struct Produto produto;
-    FILE *file = fopen(FILE_NAME, "r");
-    if (!file) {
+    struct Produto produto;  
+    FILE *file = fopen(FILE_NAME, "r");  // Abre o arquivo para leitura.
+    if (!file) {  // Verifica se o arquivo foi aberto com sucesso.
         printf("Erro ao abrir o arquivo.\n");
         return;
     }
 
-    int opcao;
-    int count = 0;
-    fseek(file, 0, SEEK_END);
-    long fileSize = ftell(file);
-    int totalProdutos = fileSize / sizeof(struct Produto);
-    rewind(file);
+    int opcao; 
+    int count = 0;  // Contador para iterar sobre os produtos.
+    fseek(file, 0, SEEK_END);  // Move o ponteiro do arquivo para o final.
+    long fileSize = ftell(file);  // Obtém o tamanho do arquivo.
+    int totalProdutos = fileSize / sizeof(struct Produto);  // Calcula o número total de produtos no arquivo.
+    rewind(file);  // Move o ponteiro do arquivo de volta para o início.
 
     printf("Escolha o tipo de visualização:\n");
     printf("1. Os 5 primeiros registros\n");
@@ -88,33 +88,33 @@ void listarProdutos() {
     printf("Opção: ");
     scanf("%d", &opcao);
 
-    if (opcao == 1) {
+    if (opcao == 1) {  // Se a opção for listar os 5 primeiros registros.
         while (fread(&produto, sizeof(struct Produto), 1, file) && count < 5) {
             printf("ID: %d, Nome: %s, Preço: %.2f, Quantidade: %d\n", produto.id, produto.nome, produto.preco, produto.quantidade);
             count++;
         }
-    } else if (opcao == 2) {
-        fseek(file, -5 * sizeof(struct Produto), SEEK_END);
+    } else if (opcao == 2) {  // Se a opção for listar os 5 últimos registros.
+        fseek(file, -5 * sizeof(struct Produto), SEEK_END);  // Move o ponteiro para o quinto produto a partir do final.
         while (fread(&produto, sizeof(struct Produto), 1, file)) {
             printf("ID: %d, Nome: %s, Preço: %.2f, Quantidade: %d\n", produto.id, produto.nome, produto.preco, produto.quantidade);
         }
-    } else if (opcao == 3) {
+    } else if (opcao == 3) {  // Se a opção for listar todos os registros.
         while (fread(&produto, sizeof(struct Produto), 1, file)) {
             printf("ID: %d, Nome: %s, Preço: %.2f, Quantidade: %d\n", produto.id, produto.nome, produto.preco, produto.quantidade);
         }
-    } else {
+    } else {  // Se a opção for inválida.
         printf("Opção inválida.\n");
     }
 
-    fclose(file);
+    fclose(file);  // Fecha o arquivo.
 }
 
 void buscarProduto() {
-    struct Produto produto;
-    int id;
-    int encontrado = 0;
-    FILE *file = fopen(FILE_NAME, "r");
-    if (!file) {
+    struct Produto produto; 
+    int id;  // Variável para armazenar o ID do produto a ser buscado.
+    int encontrado = 0;  // Flag para verificar se o produto foi encontrado.
+    FILE *file = fopen(FILE_NAME, "r");  // Abre o arquivo para leitura.
+    if (!file) {  // Verifica se o arquivo foi aberto com sucesso.
         printf("Erro ao abrir o arquivo.\n");
         return;
     }
@@ -122,27 +122,27 @@ void buscarProduto() {
     printf("Digite o ID do produto que deseja buscar: ");
     scanf("%d", &id);
 
-    while (fread(&produto, sizeof(struct Produto), 1, file)) {
-        if (produto.id == id) {
+    while (fread(&produto, sizeof(struct Produto), 1, file)) {  // Lê o arquivo produto por produto.
+        if (produto.id == id) {  // Verifica se o ID do produto lido corresponde ao ID buscado.
             printf("Produto encontrado: ID: %d, Nome: %s, Preço: %.2f, Quantidade: %d\n", produto.id, produto.nome, produto.preco, produto.quantidade);
-            encontrado = 1;
-            break;
+            encontrado = 1;  // Marca que o produto foi encontrado.
+            break;  // Sai do loop.
         }
     }
 
-    if (!encontrado) {
+    if (!encontrado) {  
         printf("Produto com ID %d não encontrado.\n", id);
     }
 
-    fclose(file);
+    fclose(file);  
 }
 
 void atualizarProduto() {
-    struct Produto produto;
-    int id;
-    int encontrado = 0;
-    FILE *file = fopen(FILE_NAME, "r+");
-    if (!file) {
+    struct Produto produto;  
+    int id;  // Variável para armazenar o ID do produto a ser atualizado.
+    int encontrado = 0;  // Flag para verificar se o produto foi encontrado.
+    FILE *file = fopen(FILE_NAME, "r+");  // Abre o arquivo para leitura e escrita.
+    if (!file) {  // Verifica se o arquivo foi aberto com sucesso.
         printf("Erro ao abrir o arquivo.\n");
         return;
     }
@@ -150,37 +150,38 @@ void atualizarProduto() {
     printf("Digite o ID do produto que deseja atualizar: ");
     scanf("%d", &id);
 
-    while (fread(&produto, sizeof(struct Produto), 1, file)) {
-        if (produto.id == id) {
+    while (fread(&produto, sizeof(struct Produto), 1, file)) {  // Lê o arquivo produto por produto.
+        if (produto.id == id) {  // Verifica se o ID do produto lido corresponde ao ID buscado.
             printf("Produto encontrado: ID: %d, Nome: %s, Preço: %.2f, Quantidade: %d\n", produto.id, produto.nome, produto.preco, produto.quantidade);
+            // Coleta das novas informações do produto.
             printf("Digite o novo nome do produto: ");
             scanf("%s", produto.nome);
             printf("Digite o novo preço do produto: ");
             scanf("%f", &produto.preco);
             printf("Digite a nova quantidade em estoque: ");
             scanf("%d", &produto.quantidade);
-            fseek(file, -sizeof(struct Produto), SEEK_CUR);
-            fwrite(&produto, sizeof(struct Produto), 1, file);
+            fseek(file, -sizeof(struct Produto), SEEK_CUR);  // Move o ponteiro do arquivo de volta ao início do produto lido.
+            fwrite(&produto, sizeof(struct Produto), 1, file);  // Reescreve o produto atualizado no arquivo.
             printf("Produto atualizado com sucesso!\n");
-            encontrado = 1;
-            break;
+            encontrado = 1;  // Marca que o produto foi encontrado e atualizado.
+            break;  // Sai do loop.
         }
     }
 
-    if (!encontrado) {
+    if (!encontrado) {  // Se o produto não foi encontrado.
         printf("Produto com ID %d não encontrado.\n", id);
     }
 
-    fclose(file);
+    fclose(file);  // Fecha o arquivo.
 }
 
 void removerProduto() {
-    struct Produto produto;
-    int id;
-    int encontrado = 0;
-    FILE *file = fopen(FILE_NAME, "r");
-    FILE *tempFile = fopen("temp.txt", "w");
-    if (!file || !tempFile) {
+    struct Produto produto;  
+    int id;  // Variável para armazenar o ID do produto a ser removido.
+    int encontrado = 0;  // Flag para verificar se o produto foi encontrado.
+    FILE *file = fopen(FILE_NAME, "r");  // Abre o arquivo original para leitura.
+    FILE *tempFile = fopen("temp.txt", "w");  // Abre um arquivo temporário para escrita.
+    if (!file || !tempFile) {  // Verifica se os arquivos foram abertos com sucesso.
         printf("Erro ao abrir o arquivo.\n");
         return;
     }
@@ -188,31 +189,32 @@ void removerProduto() {
     printf("Digite o ID do produto que deseja remover: ");
     scanf("%d", &id);
 
-    while (fread(&produto, sizeof(struct Produto), 1, file)) {
-        if (produto.id != id) {
+    while (fread(&produto, sizeof(struct Produto), 1, file)) {  // Lê o arquivo original produto por produto.
+        if (produto.id != id) {  // Escreve no arquivo temporário apenas os produtos cujo ID não corresponde ao ID a ser removido.
             fwrite(&produto, sizeof(struct Produto), 1, tempFile);
         } else {
-            encontrado = 1;
+            encontrado = 1;  // Marca que o produto foi encontrado e removido.
         }
     }
 
-    fclose(file);
-    fclose(tempFile);
+    fclose(file);  // Fecha o arquivo original.
+    fclose(tempFile);  // Fecha o arquivo temporário.
 
-    remove(FILE_NAME);
-    rename("temp.txt", FILE_NAME);
+    remove(FILE_NAME);  // Remove o arquivo original.
+    rename("temp.txt", FILE_NAME);  // Renomeia o arquivo temporário para o nome do arquivo original.
 
-    if (encontrado) {
+    if (encontrado) {  // Se o produto foi encontrado e removido.
         printf("Produto removido com sucesso!\n");
-    } else {
+    } else {  // Se o produto não foi encontrado.
         printf("Produto com ID %d não encontrado.\n", id);
     }
 }
 
 void menu() {
-    int opcao;
+    int opcao;  
 
     do {
+        // Exibe o menu de opções ao usuário.
         printf("\nMenu:\n");
         printf("1. Adicionar produto\n");
         printf("2. Listar produtos\n");
@@ -223,6 +225,7 @@ void menu() {
         printf("Opção: ");
         scanf("%d", &opcao);
 
+        // Chama a função correspondente com base na escolha do usuário.
         switch(opcao) {
             case 1:
                 adicionarProduto();
@@ -245,6 +248,6 @@ void menu() {
             default:
                 printf("Opção inválida. Tente novamente.\n");
         }
-    } while(opcao != 0);
+    } while(opcao != 0);  // Continua exibindo o menu até que o usuário escolha sair (opção 0).
 }
 
